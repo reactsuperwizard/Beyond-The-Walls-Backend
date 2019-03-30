@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" ></script>
+    <script src="/socket.io/socket.io.js"></script>
+<!--
+    <script src="/primus/primus.js"></script>
+-->
+    <script>
+        var counter = 1;
+
+        $(document).on('click', '#myButton' , function (e) {
+            console.log('button clickeed')
+            e.preventDefault();
+            e.stopPropagation();
+            // connect to current URL
+
+            var socket = io.connect();
+
+            socket.on("connect", function () {
+                console.log("Connected!");
+                var row = "<tr>"
+                        + "<td>" + counter++ + "</td>"
+                        + "<td>" + new Date() + "</td>"
+                        + "<td> Connected To Server </td>"
+                        + "</tr>";
+                $("table#NotificationTable > tbody").append(row);
+                socket.emit('messageFromClient', {token: $("#token").val()});
+
+            })
+
+            socket.on("messageFromServer", function (data) {
+                var row = '';
+                if (data.performAction = 'LOCATION_UPDATE'){
+                     row = "<tr>"
+                            + "<td>" + counter++ + "</td>"
+                            + "<td>" + new Date() + "</td>"
+                            + "<td> " + JSON.stringify(data.message) + " </td>"
+                            + "</tr>";
+                }else {
+                    row = "<tr>"
+                    + "<td>" + counter++ + "</td>"
+                    + "<td>" + new Date() + "</td>"
+                    + "<td> " + data.message + " </td>"
+                    + "</tr>";
+                }
+                $("table#NotificationTable > tbody").append(row);
+            });
+
+        })
+
+    </script>
+    <title>Seed Project</title>
+</head>
+<body>
+Welcome to Seed Project
+    Token :  <input type="text" id="token" value=""/>
+    <br/>
+    <button id="myButton">Send Token</button>
+<table border="1" id="NotificationTable">
+    <thead>
+    <th>S.no</th>
+    <th>Time</th>
+    <th>Event</th>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+</body>
+</html>
